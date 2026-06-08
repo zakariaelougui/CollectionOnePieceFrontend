@@ -1,0 +1,5 @@
+# Physical device (Expo Go) — must be on the same Wi-Fi as this machine
+EXPO_PUBLIC_API_URL=url_of_backend_process
+# EXPO_PUBLIC_API_URL=http://localhost:3000
+# iOS Simulator: use http://localhost:3000
+# Android Emulator: use http://10.0.2.2:3000
