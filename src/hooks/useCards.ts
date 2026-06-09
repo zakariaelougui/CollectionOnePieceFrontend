@@ -28,8 +28,9 @@ export function useCards() {
         setPage(targetPage);
       }
       setTotal(data.total);
-    } catch {
-      setError('Failed to load cards');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to load cards';
+      setError(msg);
     } finally {
       setLoading(false);
       setLoadingMore(false);

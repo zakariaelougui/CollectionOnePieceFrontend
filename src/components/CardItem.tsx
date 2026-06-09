@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { Card } from '../types/api.types';
+import { useAppTheme } from '../theme/useAppTheme';
 
 const COLOR_MAP: Record<string, string> = {
   Red: '#ef4444',
@@ -18,33 +19,26 @@ interface Props {
 }
 
 export function CardItem({ card, onPress }: Props) {
+  const { colors } = useAppTheme();
   const badgeColor = COLOR_MAP[card.color] ?? '#6b7280';
 
   return (
-    <Pressable style={styles.container} onPress={() => onPress(card)}>
+    <Pressable style={[styles.container, { backgroundColor: colors.surface }]} onPress={() => onPress(card)}>
       <Image
         source={{ uri: card.imageUrl }}
-        style={styles.image}
+        style={[styles.image, { backgroundColor: colors.surfaceSecondary }]}
         resizeMode="cover"
       />
       <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={2}>{card.name}</Text>
-        <View style={styles.badges}>
+        <Text style={[styles.name, { color: colors.text }]} numberOfLines={2}>{card.name}</Text>
+        <View style={styles.footer}>
           <View style={[styles.badge, { backgroundColor: badgeColor }]}>
             <Text style={styles.badgeText}>{card.color}</Text>
           </View>
-          <View style={[styles.badge, styles.typeBadge]}>
-            <Text style={styles.badgeText}>{card.type}</Text>
-          </View>
-          {card.rarity ? (
-            <View style={[styles.badge, styles.rarityBadge]}>
-              <Text style={styles.badgeText}>{card.rarity}</Text>
-            </View>
-          ) : null}
+          {card.cost != null && (
+            <Text style={[styles.cost, { color: colors.textSecondary }]}>Cost {card.cost}</Text>
+          )}
         </View>
-        {card.cost != null && (
-          <Text style={styles.meta}>Cost: {card.cost}</Text>
-        )}
       </View>
     </Pressable>
   );
@@ -52,52 +46,45 @@ export function CardItem({ card, onPress }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    padding: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e5e7eb',
-    backgroundColor: '#fff',
-    alignItems: 'center',
+    flex: 1,
+    borderRadius: 10,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   image: {
-    width: 56,
-    height: 78,
-    borderRadius: 4,
-    backgroundColor: '#f3f4f6',
+    width: '100%',
+    aspectRatio: 0.72,
   },
   info: {
-    flex: 1,
-    marginLeft: 12,
-    gap: 4,
+    padding: 8,
+    gap: 6,
   },
   name: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#111827',
+    lineHeight: 17,
   },
-  badges: {
+  footer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 4,
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   badge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
   },
-  typeBadge: {
-    backgroundColor: '#6b7280',
-  },
-  rarityBadge: {
-    backgroundColor: '#9ca3af',
-  },
   badgeText: {
     fontSize: 10,
     color: '#fff',
     fontWeight: '600',
   },
-  meta: {
-    fontSize: 12,
-    color: '#6b7280',
+  cost: {
+    fontSize: 11,
+    fontWeight: '500',
   },
 });

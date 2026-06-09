@@ -21,7 +21,17 @@ api.interceptors.response.use(
   async (error) => {
     const original: AxiosRequestConfig & { _retry?: boolean } = error.config;
 
-    if (error.response?.status !== 401 || original._retry) {
+    const status = error.response?.status;
+    const url = original?.url ?? "unknown";
+    const method = (original?.method ?? "GET").toUpperCase();
+
+    // Log all non-401 failures immediately; 401s are logged after refresh attempt below
+    if (status !== 401 || original._retry) {
+      console.error(
+        `[API] ${method} ${url} failed`,
+        `status=${status ?? "network error"}`,
+        error.response?.data ?? error.message,
+      );
       return Promise.reject(error);
     }
 
@@ -51,7 +61,8 @@ api.interceptors.response.use(
         original.headers["Authorization"] = `Bearer ${newAccessToken}`;
       }
       return api(original);
-    } catch {
+    } catch (refreshError) {
+      console.error("[API] Token refresh failed, logging out", refreshError);
       await useAuthStore.getState().logout();
       return Promise.reject(error);
     }

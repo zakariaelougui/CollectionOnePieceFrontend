@@ -4,14 +4,18 @@ import {
   ActivityIndicator, Pressable, Alert,
 } from 'react-native';
 import { Stack, router, useFocusEffect } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ListItem } from '../../../src/components/ListItem';
 import { useLists } from '../../../src/hooks/useLists';
 import { listsApi } from '../../../src/api/lists.api';
 import { ListWithCount } from '../../../src/types/api.types';
+import { useAppTheme } from '../../../src/theme/useAppTheme';
 
 export default function ListsScreen() {
   const { lists, loading, error, fetchLists, removeList } = useLists();
+  const { colors } = useAppTheme();
+  const insets = useSafeAreaInsets();
 
   useFocusEffect(
     useCallback(() => {
@@ -39,20 +43,11 @@ export default function ListsScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: 'My Lists',
-          headerRight: () => (
-            <Pressable onPress={() => router.push('/(tabs)/lists/create')} style={styles.headerBtn}>
-              <MaterialCommunityIcons name="plus" size={24} color="#3b82f6" />
-            </Pressable>
-          ),
-        }}
-      />
-      <View style={styles.container}>
+      <Stack.Screen options={{ headerShown: false }} />
+      <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
         {loading && lists.length === 0 ? (
           <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#3b82f6" />
+            <ActivityIndicator size="large" color={colors.accent} />
           </View>
         ) : error ? (
           <View style={styles.centered}>
@@ -68,21 +63,21 @@ export default function ListsScreen() {
                   <ListItem list={item} onPress={(l) => router.push(`/(tabs)/lists/${l.id}`)} />
                 </View>
                 <Pressable onPress={() => handleDelete(item)} style={styles.deleteBtn}>
-                  <MaterialCommunityIcons name="trash-can-outline" size={20} color="#ef4444" />
+                  <MaterialCommunityIcons name="trash-can-outline" size={20} color={colors.danger} />
                 </Pressable>
               </View>
             )}
             ListEmptyComponent={
               <View style={styles.centered}>
-                <Text style={styles.emptyText}>No lists yet</Text>
-                <Text style={styles.emptyHint}>Tap + to create your first list</Text>
+                <Text style={[styles.emptyText, { color: colors.text }]}>No lists yet</Text>
+                <Text style={[styles.emptyHint, { color: colors.textSecondary }]}>Tap + to create your first list</Text>
               </View>
             }
             contentContainerStyle={lists.length === 0 ? styles.flex : undefined}
           />
         )}
 
-        <Pressable style={styles.fab} onPress={() => router.push('/(tabs)/lists/create')}>
+        <Pressable style={[styles.fab, { backgroundColor: colors.accent }]} onPress={() => router.push('/(tabs)/lists/create')}>
           <MaterialCommunityIcons name="plus" size={28} color="#fff" />
         </Pressable>
       </View>
@@ -91,12 +86,12 @@ export default function ListsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
+  container: { flex: 1 },
   flex: { flex: 1 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 8, padding: 24 },
   errorText: { color: '#ef4444' },
-  emptyText: { fontSize: 18, fontWeight: '600', color: '#374151' },
-  emptyHint: { fontSize: 14, color: '#6b7280' },
+  emptyText: { fontSize: 18, fontWeight: '600' },
+  emptyHint: { fontSize: 14 },
   row: { flexDirection: 'row', alignItems: 'center' },
   rowContent: { flex: 1 },
   deleteBtn: {
@@ -104,7 +99,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headerBtn: { paddingRight: 8 },
   fab: {
     position: 'absolute',
     bottom: 24,
@@ -112,7 +106,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#3b82f6',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

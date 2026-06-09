@@ -7,12 +7,13 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
   ScrollView,
 } from "react-native";
+import { Button } from "react-native-paper";
 import { router } from "expo-router";
 import { authApi } from "../../src/api/auth.api";
 import { useAuthStore } from "../../src/store/auth.store";
+import { useAppTheme } from "../../src/theme/useAppTheme";
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState("");
@@ -21,6 +22,7 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const login = useAuthStore((s) => s.login);
+  const { colors } = useAppTheme();
 
   const handleRegister = async () => {
     if (!username.trim() || !email.trim() || !password) {
@@ -54,8 +56,6 @@ export default function RegisterScreen() {
         e?.response?.data?.message ??
         e?.response?.data?.error ??
         "Registration failed";
-      console.log(e);
-      console.log(msg);
       setError(typeof msg === "string" ? msg : "Registration failed");
     } finally {
       setLoading(false);
@@ -64,29 +64,33 @@ export default function RegisterScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.flex}
+      style={[styles.flex, { backgroundColor: colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Join the One Piece TCG community</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Create Account</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          Join the One Piece TCG community
+        </Text>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="Username"
+          placeholderTextColor={colors.textSecondary}
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
           autoCorrect={false}
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="Email"
+          placeholderTextColor={colors.textSecondary}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -94,8 +98,9 @@ export default function RegisterScreen() {
           autoCorrect={false}
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="Password (8–16 characters)"
+          placeholderTextColor={colors.textSecondary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -103,21 +108,22 @@ export default function RegisterScreen() {
           returnKeyType="go"
         />
 
-        <Pressable
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleRegister}
+        <Button
+          mode="contained"
+          loading={loading}
           disabled={loading}
+          onPress={handleRegister}
+          style={styles.button}
+          contentStyle={styles.buttonContent}
+          labelStyle={styles.buttonLabel}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Create Account</Text>
-          )}
-        </Pressable>
+          Create Account
+        </Button>
 
         <Pressable onPress={() => router.back()} style={styles.linkContainer}>
-          <Text style={styles.linkText}>
-            Already have an account? <Text style={styles.link}>Sign In</Text>
+          <Text style={[styles.linkText, { color: colors.textSecondary }]}>
+            Already have an account?{" "}
+            <Text style={[styles.link, { color: colors.accent }]}>Sign In</Text>
           </Text>
         </Pressable>
       </ScrollView>
@@ -126,7 +132,7 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: "#f9fafb" },
+  flex: { flex: 1 },
   container: {
     flexGrow: 1,
     justifyContent: "center",
@@ -135,13 +141,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#111827",
     textAlign: "center",
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 15,
-    color: "#6b7280",
     textAlign: "center",
     marginBottom: 32,
   },
@@ -152,9 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   input: {
-    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#d1d5db",
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 13,
@@ -162,15 +164,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   button: {
-    backgroundColor: "#3b82f6",
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: "center",
     marginTop: 4,
+    borderRadius: 10,
   },
-  buttonDisabled: { backgroundColor: "#93c5fd" },
-  buttonText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  buttonContent: { paddingVertical: 6 },
+  buttonLabel: { fontWeight: "700", fontSize: 16 },
   linkContainer: { marginTop: 20, alignItems: "center" },
-  linkText: { fontSize: 14, color: "#6b7280" },
-  link: { color: "#3b82f6", fontWeight: "600" },
+  linkText: { fontSize: 14 },
+  link: { fontWeight: "600" },
 });

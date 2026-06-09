@@ -13,8 +13,9 @@ export function useLists() {
     try {
       const data = await listsApi.getLists();
       setLists(data);
-    } catch {
-      setError('Failed to load lists');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to load lists';
+      setError(msg);
     } finally {
       setLoading(false);
     }

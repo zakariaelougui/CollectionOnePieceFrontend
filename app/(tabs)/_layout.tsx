@@ -2,9 +2,11 @@ import React from 'react';
 import { Tabs, Redirect } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/auth.store';
+import { useAppTheme } from '../../src/theme/useAppTheme';
 
 export default function TabsLayout() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const { colors } = useAppTheme();
 
   if (!isAuthenticated) {
     return <Redirect href="/(auth)/login" />;
@@ -13,10 +15,11 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#3b82f6',
-        tabBarInactiveTintColor: '#9ca3af',
-        headerStyle: { backgroundColor: '#fff' },
-        headerTitleStyle: { fontWeight: '700' },
+        tabBarActiveTintColor: colors.tabBarActiveTint,
+        tabBarInactiveTintColor: colors.tabBarInactiveTint,
+        tabBarStyle: { backgroundColor: colors.tabBarBackground, borderTopColor: colors.border },
+        headerStyle: { backgroundColor: colors.headerBackground },
+        headerTitleStyle: { fontWeight: '700', color: colors.text },
       }}
     >
       <Tabs.Screen

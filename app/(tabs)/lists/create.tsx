@@ -5,12 +5,14 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { listsApi } from '../../../src/api/lists.api';
+import { useAppTheme } from '../../../src/theme/useAppTheme';
 
 export default function CreateListScreen() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { colors } = useAppTheme();
 
   const handleCreate = async () => {
     if (!name.trim()) {
@@ -31,20 +33,25 @@ export default function CreateListScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={[styles.flex, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <View style={styles.container}>
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="List name *"
+          placeholderTextColor={colors.textSecondary}
           value={name}
           onChangeText={setName}
           autoFocus
         />
         <TextInput
-          style={[styles.input, styles.multiline]}
+          style={[styles.input, styles.multiline, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="Description (optional)"
+          placeholderTextColor={colors.textSecondary}
           value={description}
           onChangeText={setDescription}
           multiline
@@ -56,7 +63,7 @@ export default function CreateListScreen() {
         </Pressable>
 
         <Pressable onPress={() => router.back()} style={styles.cancel}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
@@ -64,13 +71,11 @@ export default function CreateListScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#f9fafb' },
+  flex: { flex: 1 },
   container: { padding: 20, gap: 12 },
   errorText: { color: '#ef4444', fontSize: 14 },
   input: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#d1d5db',
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 13,
@@ -91,5 +96,5 @@ const styles = StyleSheet.create({
   buttonDisabled: { backgroundColor: '#93c5fd' },
   buttonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   cancel: { alignItems: 'center', padding: 10 },
-  cancelText: { color: '#6b7280', fontSize: 15 },
+  cancelText: { fontSize: 15 },
 });

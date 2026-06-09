@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, Pressable, StyleSheet,
-  KeyboardAvoidingView, Platform, ActivityIndicator, ScrollView,
+  KeyboardAvoidingView, Platform, ScrollView,
 } from 'react-native';
+import { Button } from 'react-native-paper';
 import { router } from 'expo-router';
 import { authApi } from '../../src/api/auth.api';
 import { useAuthStore } from '../../src/store/auth.store';
+import { useAppTheme } from '../../src/theme/useAppTheme';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -13,6 +15,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const login = useAuthStore((s) => s.login);
+  const { colors } = useAppTheme();
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
@@ -34,16 +37,20 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={[styles.flex, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>One Piece TCG</Text>
-        <Text style={styles.subtitle}>Sign in to your account</Text>
+        <Text style={[styles.title, { color: colors.text }]}>One Piece TCG</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign in to your account</Text>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="Email"
+          placeholderTextColor={colors.textSecondary}
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -51,8 +58,9 @@ export default function LoginScreen() {
           autoCorrect={false}
         />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
           placeholder="Password"
+          placeholderTextColor={colors.textSecondary}
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -60,12 +68,22 @@ export default function LoginScreen() {
           returnKeyType="go"
         />
 
-        <Pressable style={[styles.button, loading && styles.buttonDisabled]} onPress={handleLogin} disabled={loading}>
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign In</Text>}
-        </Pressable>
+        <Button
+          mode="contained"
+          loading={loading}
+          disabled={loading}
+          onPress={handleLogin}
+          style={styles.button}
+          contentStyle={styles.buttonContent}
+          labelStyle={styles.buttonLabel}
+        >
+          Sign In
+        </Button>
 
         <Pressable onPress={() => router.push('/(auth)/register')} style={styles.linkContainer}>
-          <Text style={styles.linkText}>Don't have an account? <Text style={styles.link}>Register</Text></Text>
+          <Text style={[styles.linkText, { color: colors.textSecondary }]}>
+            Don't have an account? <Text style={[styles.link, { color: colors.accent }]}>Register</Text>
+          </Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -73,7 +91,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: '#f9fafb' },
+  flex: { flex: 1 },
   container: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -82,13 +100,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#111827',
     textAlign: 'center',
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 15,
-    color: '#6b7280',
     textAlign: 'center',
     marginBottom: 32,
   },
@@ -99,9 +115,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   input: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#d1d5db',
     borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 13,
@@ -109,15 +123,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   button: {
-    backgroundColor: '#3b82f6',
-    borderRadius: 10,
-    paddingVertical: 14,
-    alignItems: 'center',
     marginTop: 4,
+    borderRadius: 10,
   },
-  buttonDisabled: { backgroundColor: '#93c5fd' },
-  buttonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  buttonContent: { paddingVertical: 6 },
+  buttonLabel: { fontWeight: '700', fontSize: 16 },
   linkContainer: { marginTop: 20, alignItems: 'center' },
-  linkText: { fontSize: 14, color: '#6b7280' },
-  link: { color: '#3b82f6', fontWeight: '600' },
+  linkText: { fontSize: 14 },
+  link: { fontWeight: '600' },
 });
